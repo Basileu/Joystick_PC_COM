@@ -83,7 +83,7 @@ namespace USB_Joystick_v0_1_C_Sharp
                 SendJoystickData(xValue, yValue);
                 bool[] buttons = state.GetButtons();
 
-                if (id == 0)
+                //if (id == 0)
                 {
                     for (int i = 0; i < buttons.Length; i++)
                     {
@@ -133,7 +133,8 @@ namespace USB_Joystick_v0_1_C_Sharp
         private void timer1_Tick_1(object sender, EventArgs e)
         {
             for (int i = 0; i < Sticks.Length; i++)
-                stickHandle(Sticks[i], i);
+                if (Sticks[i].Properties.InstanceName == "Logitech RumblePad 2 USB")
+                    stickHandle(Sticks[i], i);
         }
 
         private void btnGetSerialPorts_Click(object sender, EventArgs e)
@@ -187,14 +188,6 @@ namespace USB_Joystick_v0_1_C_Sharp
                 return;
             }
 
-            //SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
-            //if (port == null)
-            //    return;
-            //port.Open();
-            // Write a string
-            //port.Write("Hello World");
-            //port.Write(buttNr.ToString()  + "\r\n");
-
             String strToSend = buttNr.ToString();
             ComPort.Write(0xFF + strToSend.Length.ToString() + strToSend);
 
@@ -215,16 +208,6 @@ namespace USB_Joystick_v0_1_C_Sharp
                 //MessageBox.Show(String.Format("Port is not selected"));
                 return;
             }
-
-            //SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
-
-            //// Open the port for communications
-            //if (port == null)
-            //{
-            //    //MessageBox.Show(String.Format("Port is not selected"));
-            //    return;
-            //}
-            //port.Open();
 
             // Write a string
             //port.Write("Hello World");
