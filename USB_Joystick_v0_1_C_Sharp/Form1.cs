@@ -38,10 +38,12 @@ namespace USB_Joystick_v0_1_C_Sharp
         private const int MOUSEEVENT_LEFTDOWN = 0x2;
         private const int MOUSEEVENT_LEFTUP = 0x4;
 
+        private bool portOpened = false;
+
         public Joystick[] GetSticks()
         {
             List<SlimDX.DirectInput.Joystick> sticks = new List<SlimDX.DirectInput.Joystick>();
-            foreach(DeviceInstance device in Input.GetDevices(DeviceClass.GameController, DeviceEnumerationFlags.AttachedOnly))
+            foreach (DeviceInstance device in Input.GetDevices(DeviceClass.GameController, DeviceEnumerationFlags.AttachedOnly))
             {
                 try
                 {
@@ -52,12 +54,12 @@ namespace USB_Joystick_v0_1_C_Sharp
                     {
                         if ((deviceObject.ObjectType & ObjectDeviceType.Axis) != 0)
                         {
-                            stick.GetObjectPropertiesById((int)deviceObject.ObjectType).SetRange(-100,100);
+                            stick.GetObjectPropertiesById((int)deviceObject.ObjectType).SetRange(-100, 100);
                         }
                     }
                     sticks.Add(stick);
                 }
-                catch(DirectInputException)
+                catch (DirectInputException)
                 {
 
                 }
@@ -76,38 +78,41 @@ namespace USB_Joystick_v0_1_C_Sharp
 
             //Sending Joystick data over USB2UART
             //MouseMove(xValue, yValue);
-            SendJoystickData(xValue, yValue);
-            bool[] buttons = state.GetButtons();
-
-            if (id == 0)
+            if (ComPort.IsOpen)
             {
-                for (int i = 0; i< buttons.Length; i++)
-                {
-                    if (buttons[i])
-                    {
-                        SendButtonsData(i);
-                        //MessageBox.Show(String.Format("Button '{0}' pressed", i));
-                    }
-                }
-            //    if (buttons[0])
-            //    {
-            //        Do stuff
-            //        if (mouseClicked == false)
-            //        {
-            //            mouse_event(MOUSEEVENT_LEFTDOWN, 0, 0, 0, 0);
-            //            mouseClicked = true;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        if (mouseClicked == true)
-            //        {
-            //            mouse_event(MOUSEEVENT_LEFTUP, 0, 0, 0, 0);
-            //            mouseClicked = false;
+                SendJoystickData(xValue, yValue);
+                bool[] buttons = state.GetButtons();
 
-                //        }
-                //    }
+                if (id == 0)
+                {
+                    for (int i = 0; i < buttons.Length; i++)
+                    {
+                        if (buttons[i])
+                        {
+                            SendButtonsData(i);
+                            //MessageBox.Show(String.Format("Button '{0}' pressed", i));
+                        }
+                    }
+                    //    if (buttons[0])
+                    //    {
+                    //        Do stuff
+                    //        if (mouseClicked == false)
+                    //        {
+                    //            mouse_event(MOUSEEVENT_LEFTDOWN, 0, 0, 0, 0);
+                    //            mouseClicked = true;
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (mouseClicked == true)
+                    //        {
+                    //            mouse_event(MOUSEEVENT_LEFTUP, 0, 0, 0, 0);
+                    //            mouseClicked = false;
+
+                    //        }
+                    //    }
                 }
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -182,21 +187,22 @@ namespace USB_Joystick_v0_1_C_Sharp
                 return;
             }
 
-            SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
-
-            port.Open();
+            //SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
+            //if (port == null)
+            //    return;
+            //port.Open();
             // Write a string
             //port.Write("Hello World");
             //port.Write(buttNr.ToString()  + "\r\n");
 
             String strToSend = buttNr.ToString();
-            port.Write(0xFF + strToSend.Length.ToString() + strToSend);
+            ComPort.Write(0xFF + strToSend.Length.ToString() + strToSend);
 
             // Write a set of bytes
             //port.Write(new byte[] { 0x0A, 0xE2, 0xFF }, 0, 3);
 
             // Close the port
-            port.Close();
+            //port.Close();
         }
         private void SendJoystickData(int posx, int posy)
         {
@@ -210,15 +216,15 @@ namespace USB_Joystick_v0_1_C_Sharp
                 return;
             }
 
-            SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
+            //SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
 
-            // Open the port for communications
-            if (port == null)
-            {
-                //MessageBox.Show(String.Format("Port is not selected"));
-                return;
-            }
-            port.Open();
+            //// Open the port for communications
+            //if (port == null)
+            //{
+            //    //MessageBox.Show(String.Format("Port is not selected"));
+            //    return;
+            //}
+            //port.Open();
 
             // Write a string
             //port.Write("Hello World");
@@ -227,29 +233,29 @@ namespace USB_Joystick_v0_1_C_Sharp
             //port.Write("7"+ "8" + "\t" + posx.ToString() + "\t" + posy.ToString() + "\r\n");
             if (posx > 10)
                 posx = 1;
-            else if(posx < -10)
+            else if (posx < -10)
                 posx = 2;
             else // Idle position
                 posx = 0;
             if (posy < -10)
                 posy = 1;
-            else if(posy > 3)
+            else if (posy > 3)
                 posy = 3;
             else
                 posy = 0;
 
             //String strToSend = "8" + "\t" + posx.ToString() + "\t" + posy.ToString();
             //String strToSend = "8" + "\t" + posx.ToString() + "\t" + posy.ToString();
-            String strToSend = "8" +  posx.ToString() + posy.ToString();
+            String strToSend = "8" + posx.ToString() + posy.ToString();
 
             //port.Write("8" + "\t" + posx.ToString() + "\t" + posy.ToString() + "\r\n");
-            port.Write(0xFF + strToSend.Length.ToString() + strToSend);
+            ComPort.Write(0xFF + strToSend.Length.ToString() + strToSend);
 
             // Write a set of bytes
             //port.Write(new byte[] { 0x0A, 0xE2, 0xFF }, 0, 3);
 
             // Close the port
-            port.Close();
+            //port.Close();
         }
 
         private void SendString_Click(object sender, EventArgs e)
@@ -258,13 +264,13 @@ namespace USB_Joystick_v0_1_C_Sharp
             // port with some basic settings
 
             //String portName = cboPorts.SelectedItem.ToString();
-            if(cboPorts.SelectedItem == null)
+            if (cboPorts.SelectedItem == null)
             {
                 MessageBox.Show(String.Format("Port is not selected"));
                 return;
             }
 
-            SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
+            //SerialPort port = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
 
             // Open the port for communications
             //if (port==null)
@@ -272,16 +278,34 @@ namespace USB_Joystick_v0_1_C_Sharp
             //    MessageBox.Show(String.Format("Port is not selected"));
             //    return;
             //}
-            port.Open();
+            //port.Open();
 
             // Write a string
-            port.Write("Hello World");
+            ComPort.Write("Hello World");
 
             // Write a set of bytes
-            port.Write(new byte[] { 0x0A, 0xE2, 0xFF }, 0, 3);
+            ComPort.Write(new byte[] { 0x0A, 0xE2, 0xFF }, 0, 3);
 
             // Close the port
-            port.Close();
+            //port.Close();
+        }
+
+        private void cboPorts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComPort = new SerialPort(cboPorts.SelectedItem.ToString(), 115200, Parity.None, 8, StopBits.One);
+            if (ComPort == null)
+            {
+                MessageBox.Show(String.Format("Cannot allocate port"));
+                return;
+            }
+            ComPort.Open();
+            portOpened = true;
+
+        }
+
+        private void ClosePort_Click(object sender, EventArgs e)
+        {
+            ComPort.Close();
         }
     }
 }

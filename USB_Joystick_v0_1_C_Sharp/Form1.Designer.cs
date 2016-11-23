@@ -34,11 +34,12 @@
             this.rtbIncoming = new System.Windows.Forms.RichTextBox();
             this.cboPorts = new System.Windows.Forms.ComboBox();
             this.SendString = new System.Windows.Forms.Button();
+            this.ClosePort = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // timer1
             // 
-            this.timer1.Interval = 10;
+            this.timer1.Interval = 5;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick_1);
             // 
             // btnGetSerialPorts
@@ -67,6 +68,7 @@
             this.cboPorts.Name = "cboPorts";
             this.cboPorts.Size = new System.Drawing.Size(121, 21);
             this.cboPorts.TabIndex = 2;
+            this.cboPorts.SelectedIndexChanged += new System.EventHandler(this.cboPorts_SelectedIndexChanged);
             // 
             // SendString
             // 
@@ -78,11 +80,22 @@
             this.SendString.UseVisualStyleBackColor = true;
             this.SendString.Click += new System.EventHandler(this.SendString_Click);
             // 
+            // ClosePort
+            // 
+            this.ClosePort.Location = new System.Drawing.Point(172, 185);
+            this.ClosePort.Name = "ClosePort";
+            this.ClosePort.Size = new System.Drawing.Size(75, 23);
+            this.ClosePort.TabIndex = 4;
+            this.ClosePort.Text = "ClosePort";
+            this.ClosePort.UseVisualStyleBackColor = true;
+            this.ClosePort.Click += new System.EventHandler(this.ClosePort_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Controls.Add(this.ClosePort);
             this.Controls.Add(this.SendString);
             this.Controls.Add(this.cboPorts);
             this.Controls.Add(this.rtbIncoming);
@@ -101,6 +114,7 @@
         private System.Windows.Forms.RichTextBox rtbIncoming;
         private System.Windows.Forms.ComboBox cboPorts;
         private System.Windows.Forms.Button SendString;
+        private System.Windows.Forms.Button ClosePort;
     }
 }
 
